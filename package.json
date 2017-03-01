@@ -1,16 +1,22 @@
 {
-	"name": "NodejsStarterApp",
-	"version": "0.0.1",
-	"private": true,
-	"scripts": {
-		"start": "node app.js"
-	},
-	"dependencies": {
-		"express": "4.13.x",
-		"cfenv": "1.0.x"
-	},
-	"repository": {},
-	"engines": {
-		"node": "4.x"
-	} 
+  "name": "NodejsStarterApp",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "start": "node app.js"
+  },
+  "dependencies": {
+    "body-parser": "^1.15.2",
+    "cors": "^2.7.1",
+    "express": "^4.14.0",
+    "firebase": "^3.2.0",
+    "http": "0.0.0",
+    "moment": "^2.14.1",
+    "moment-duration-format": "^1.3.0",
+    "moment-timezone": "^0.5.4",
+    "reqclient": "^1.2.2"
+  },
+  "engines": {
+    "node": "5.4.1"
+  }
 }
