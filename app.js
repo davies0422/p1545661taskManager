@@ -55,7 +55,7 @@ router.route('/TaskManager/addTaskItem')
 // create a Location (accessed at POST http://localhost:8080/api/TaskManager/addTaskItem)
     .post(function(req, res) {
         // create a new instance of the Location model
-        var location = new TaskItem(locationsDbRef,req.body.taskName);
+        var location = new TaskItem(locationsDbRef,req.body.taskName,req.body.taskInfo);
         // save the bear and check for errors
         location.saveToFirebase(function(err) {
             if (err)
@@ -64,17 +64,17 @@ router.route('/TaskManager/addTaskItem')
         });
     });
 // test route to make sure everything is working (accessed at GET http://localhost:8080/api)
-router.get('/TaskManager/testItem', function(req, res) {
-
-    // create a new instance of the Location model
-    var taskItem = new TaskItem(locationsDbRef,'omg');
-    // save the bear and check for errors
-    taskItem.saveToFirebase(function(err) {
-        if (err)
-            res.send(err);
-        res.json({ message: 'Task Item data is stored in Firebase' });
-    });
-});
+// router.get('/TaskManager/testItem', function(req, res) {
+//
+//     // create a new instance of the Location model
+//     var taskItem = new TaskItem(locationsDbRef,'omg');
+//     // save the bear and check for errors
+//     taskItem.saveToFirebase(function(err) {
+//         if (err)
+//             res.send(err);
+//         res.json({ message: 'Task Item data is stored in Firebase' });
+//     });
+// });
 
 router.get('/TaskManager/getTaskItem', function getTaskItem(req, res, next) {
     var ref = firebase.database().ref("tasks");
