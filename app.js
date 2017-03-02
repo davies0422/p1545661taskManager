@@ -52,7 +52,6 @@ router.use(function(req, res, next) {
     next(); // make sure we go to the next routes and don't stop here
 });
 router.route('/TaskManager/addTaskItem')
-
 // create a Location (accessed at POST http://localhost:8080/api/TaskManager/addTaskItem)
     .post(function(req, res) {
         // create a new instance of the Location model
@@ -63,10 +62,9 @@ router.route('/TaskManager/addTaskItem')
                 res.send(err);
             res.json({ message: 'Task Item data created in Firebase' });
         });
-
     });
 // test route to make sure everything is working (accessed at GET http://localhost:8080/api)
-router.get('/TaskManager/testingonly', function(req, res) {
+router.get('/TaskManager/testItem', function(req, res) {
 
     // create a new instance of the Location model
     var taskItem = new TaskItem(locationsDbRef,'omg');
@@ -74,10 +72,27 @@ router.get('/TaskManager/testingonly', function(req, res) {
     taskItem.saveToFirebase(function(err) {
         if (err)
             res.send(err);
-        res.json({ message: 'Task Item data created in Firebase' });
+        res.json({ message: 'Task Item data is stored in Firebase' });
     });
-
 });
+
+router.get('/TaskManager/getTaskItem', function getTaskItem(req, res, next) {
+    var ref = firebase.database().ref("tasks");
+    //var chilkat = require('chilkat_node5_win32');
+    //var json = new chilkat.JsonObject();
+
+    ref.on("value", function(snapshot) {
+        console.log(snapshot.val());
+        res.json(snapshot.val());
+
+    }, function (errorObject) {
+        console.log("The read failed: " + errorObject.code);
+    });
+});
+
+//router.route('/TaskManager/addTaskPriority')
+
+
 router.get('/', function(req, res) {
     res.json({ message: 'hooray! welcome to our api!' });
 

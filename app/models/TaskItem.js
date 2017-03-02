@@ -22,7 +22,10 @@ module.exports = TaskItem;
       var taskItem = {
         task_name: this._taskName,
 		task_id: newTaskKey,
+        completed: false,
         create_date_time:  new Date().getTime()
+
+
     };
       inDbReference.push(taskItem);
 	
