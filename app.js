@@ -1,110 +1,66 @@
-// server.js
 
-// BASE SETUP
-// =============================================================================
+/**
+ * Module dependencies.
+ */
 
-// call the packages we need
 var express = require('express')
-    , cors = require('cors')
-    , app = express();//https://github.com/expressjs/cors#simple-usage-enable-all-cors-requests
-
-app.use(cors());
-var app        = express();                 // define our app using express
+    , http = require('http')
+    , path = require('path');
+var favicon = require('serve-favicon');
+var logger = require('morgan');
+var cookieParser = require('cookie-parser');
+var methodOverride = require('method-override');
 var bodyParser = require('body-parser');
-var TaskItem     = require('./app/models/TaskItem');
-var firebase = require('firebase');
-var moment = require('moment');
-var https = require('https');
-var request = require('request');
-moment = require('moment-timezone');
-require('moment-duration-format');
+var app = express();
 
-// SETUP FIREBASE
-// =============================================================================
-// Initialize Firebase
-var config = {
-    apiKey: "AIzaSyCbaExC4j-v1P2DKMA8195xxOvckTLHOyI",
-    authDomain: "task-manager-b9d83.firebaseapp.com",
-    databaseURL: "https://task-manager-b9d83.firebaseio.com",
-    storageBucket: "task-manager-b9d83.appspot.com",
-    messagingSenderId: "806320697979"
-};
-firebase.initializeApp(config);
-var databaseReference = firebase.database();
-var locationsDbRef = databaseReference.ref('tasks');
-// configure app to use bodyParser()
-// this will let us get the data from a POST
-app.use(bodyParser.urlencoded({ extended: true }));
+
+// Listening to port 3000 when nodeJs server is running on localhost
+app.set('port', process.env.PORT || 3000);
+app.use(logger('dev'));
 app.use(bodyParser.json());
-app.use(cors());//Enable cors for all routes
-var port = process.env.PORT || 3000;        // set our port
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(cookieParser());
+app.use(methodOverride());
+// uncomment after placing your favicon in /public
+//app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(cookieParser());
+app.use(express.static(path.join(__dirname, 'public')));
+// view engine setup
+app.set('views', path.join(__dirname, 'views'));
+app.set('view engine', 'pug');
+// error handler
 
-// ROUTES FOR OUR API
-// =============================================================================
-var router = express.Router();              // get an instance of the express Router
 
+// error handler
+app.use(function(err, req, res, next) {
+    // set locals, only providing error in development
+    res.locals.message = err.message;
+    res.locals.error = req.app.get('env') === 'development' ? err : {};
 
-
-// middleware to use for all requests
-router.use(function(req, res, next) {
-    // do logging
-    console.log('Something is happening.');
-    next(); // make sure we go to the next routes and don't stop here
-});
-router.route('/TaskManager/addTaskItem')
-// create a Location (accessed at POST http://localhost:8080/api/TaskManager/addTaskItem)
-    .post(function(req, res) {
-        // create a new instance of the Location model
-        var location = new TaskItem(locationsDbRef,req.body.taskName,req.body.taskInfo);
-        // save the bear and check for errors
-        location.saveToFirebase(function(err) {
-            if (err)
-                res.send(err);
-            res.json({ message: 'Task Item data created in Firebase' });
-        });
-    });
-// test route to make sure everything is working (accessed at GET http://localhost:8080/api)
-// router.get('/TaskManager/testItem', function(req, res) {
-//
-//     // create a new instance of the Location model
-//     var taskItem = new TaskItem(locationsDbRef,'omg');
-//     // save the bear and check for errors
-//     taskItem.saveToFirebase(function(err) {
-//         if (err)
-//             res.send(err);
-//         res.json({ message: 'Task Item data is stored in Firebase' });
-//     });
-// });
-
-router.get('/TaskManager/getTaskItem', function getTaskItem(req, res, next) {
-    var ref = firebase.database().ref("tasks");
-    //var chilkat = require('chilkat_node5_win32');
-    //var json = new chilkat.JsonObject();
-
-    ref.on("value", function(snapshot) {
-        console.log(snapshot.val());
-        res.json(snapshot.val());
-
-    }, function (errorObject) {
-        console.log("The read failed: " + errorObject.code);
-    });
+    // render the error page
+    res.status(err.status || 500);
+    res.render('error');
 });
 
-//router.route('/TaskManager/addTaskPriority')
-
-
-router.get('/', function(req, res) {
-    res.json({ message: 'hooray! welcome to our api!' });
-
+//http://stackoverflow.com/questions/32957123/express-router-crud-api-cannot-delete
+app.all('*', function(req, res, next) {
+    res.header('Access-Control-Allow-Origin', '*');
+    res.header('Access-Control-Allow-Methods', 'PUT, GET, POST, DELETE, OPTIONS');
+    res.header('Access-Control-Allow-Headers', 'X-Requested-With, content-type, Authorization');
+    next();
 });
+/* Importing the function from index.js and parsing app(express instance).
+ By doing so, you are able to require the files in the controllers folder.
+ Refer to index.js to find out about the files that are being required.
+ */
+require("./routes/index")(app);
 
-// more routes for our API will happen here
 
-// REGISTER OUR ROUTES -------------------------------
-// all of our routes will be prefixed with /api
-app.use('/api', router);
 
-// START THE SERVER
-// =============================================================================
-app.listen(port);
-console.log('Magic happens on port ' + port);
+
+
+// Initializing the server when server.js is being executed
+http.createServer(app).listen(app.get('port'), function(){
+    console.log("Express server listening on port " + app.get('port'));
+});
